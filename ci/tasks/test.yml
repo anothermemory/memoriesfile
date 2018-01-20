@@ -1,0 +1,32 @@
+---
+platform: linux
+
+inputs:
+- name: git-memoriesfile
+  path: gopath/src/github.com/anothermemory/memoriesfile
+- name: git-memories
+  path: gopath/src/github.com/anothermemory/memories
+- name: git-memory
+  path: gopath/src/github.com/anothermemory/memory
+- name: git-storagedir
+  path: gopath/src/github.com/anothermemory/storagedir
+- name: git-storage
+  path: gopath/src/github.com/anothermemory/storage
+- name: git-unit
+  path: gopath/src/github.com/anothermemory/unit
+- name: git-id
+  path: gopath/src/github.com/anothermemory/id
+- name: git-clock
+  path: gopath/src/github.com/anothermemory/clock
+
+run:
+  path: sh
+  args:
+    - -exc
+    - |
+      export GOPATH=$(pwd)/gopath:${GOPATH} && \
+      cd gopath/src/github.com/anothermemory/memoriesfile && \
+      go version && \
+      zb build && \
+      zb lint -f --exclude=/usr/local/go && \
+      go test -v ./...
