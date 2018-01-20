@@ -18,10 +18,12 @@ type file struct {
 	fsUtil *afero.Afero
 }
 
+// New creates new instance which stores memories using given path
 func New(path string) (memories.Interface, error) {
 	return create(path, afero.NewOsFs())
 }
 
+// NewInMemory creates new instance which stores memories using memory file system
 func NewInMemory() (memories.Interface, error) {
 	return create("/anothermemory/memories.json", afero.NewMemMapFs())
 }
@@ -102,22 +104,24 @@ func (f *file) load() error {
 }
 
 func (f *file) save() error {
+	var data []byte
+	var err error
 	dir := filepath.Dir(f.path)
-	err := f.fs.MkdirAll(dir, os.ModePerm)
+	err = f.fs.MkdirAll(dir, os.ModePerm)
 	if nil != err {
 		return errors.WithStack(err)
 	}
 
 	j := &fileJSON{}
 	for _, s := range f.items {
-		m, err := json.Marshal(s)
+		data, err = json.Marshal(s)
 		if nil != err {
 			return errors.Wrapf(err, "Failed to marshal memory: %s", s.Name())
 		}
-		j.Items = append(j.Items, m)
+		j.Items = append(j.Items, data)
 	}
 
-	data, err := json.Marshal(j)
+	data, err = json.Marshal(j)
 
 	if nil != err {
 		return errors.Wrap(err, "Failed to serialize config file")
